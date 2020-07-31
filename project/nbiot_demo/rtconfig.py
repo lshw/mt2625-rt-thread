@@ -19,7 +19,7 @@ sdk_root = os.path.abspath('../../')
 # EXEC_PATH is the compiler execute path, for example, CodeSourcery, Keil MDK, IAR
 if  CROSS_TOOL == 'gcc':
     PLATFORM    = 'gcc'
-    EXEC_PATH   = os.path.join(sdk_root, 'tools', 'toolchain', 'gcc-arm-none-eabi-4_8-2014q3', 'bin')
+    EXEC_PATH   = '/usr/bin' #os.path.join(sdk_root, 'tools', 'toolchain', 'gcc-arm-none-eabi-4_8-2014q3', 'bin')
 else:
     print("Error: Not support <%s> cross tool" % CROSS_TOOL)
     exit(-1)
@@ -30,9 +30,6 @@ if not os.path.exists(EXEC_PATH):
 
 print("EXEC_PATH: %s" % EXEC_PATH)
 
-if not os.path.exists(os.path.join(os.path.dirname(EXEC_PATH), 'lib', 'gcc', 'arm-none-eabi', '4.8.4')):
-    print('Error: Only support "gcc-arm-none-eabi-4_8-2014q3" version!')
-    exit(-1)
 
 BUILD = 'debug' # 'release' or 'debug'
 
