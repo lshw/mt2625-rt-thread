@@ -1,0 +1,49 @@
+Import('rtconfig')
+from building import *
+
+# get current directory
+cwd = GetCurrentDir()
+
+# The set of source files associated with this SConscript file.
+src = Split("""
+drv_common.c
+""")
+
+if GetDepend(['BSP_USING_GPIO', 'RT_USING_PIN']):
+    src += ['drv_gpio.c']
+    
+if GetDepend(['BSP_USING_UART', 'RT_USING_SERIAL']):
+    src += ['drv_usart.c']
+
+if GetDepend(['BSP_USING_WDT', 'RT_USING_WDT']):
+    src += ['drv_wdt.c']
+
+if GetDepend(['BSP_USING_GPT_TIMER', 'RT_USING_HWTIMER']):
+    src += ['drv_gpt.c']
+
+if GetDepend(['BSP_USING_I2C', 'RT_USING_I2C']):
+    src += ['drv_i2c.c']
+
+if GetDepend(['BSP_USING_ADC', 'RT_USING_ADC']):
+    src += ['drv_adc.c']
+
+if GetDepend(['BSP_USING_PWM', 'RT_USING_PWM']):
+    src += ['drv_pwm.c']
+
+if GetDepend(['BSP_USING_SPI', 'RT_USING_SPI']):
+    src += ['drv_spi.c']
+
+if GetDepend(['BSP_USING_ONCHIP_RTC', 'RT_USING_RTC']):
+    src += ['drv_rtc.c']
+
+if GetDepend(['BSP_USING_SLEEP_MANAGER', 'RT_USING_PM']):
+    src += ['drv_pm.c']
+
+if GetDepend(['BSP_USING_SDIO']):
+    src += ['drv_sdio.c']
+
+path = [cwd]
+
+group = DefineGroup('rt_drivers', src, depend = [''], CPPPATH = path)
+
+Return('group')

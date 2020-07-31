@@ -1,0 +1,7 @@
+
+menu "sdk config"
+
+config RT_NB_SDK_VERSION
+    string "rt-thread nbiot sdk version"
+    default "v1.1"
+endmenu

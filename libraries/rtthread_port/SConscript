@@ -1,0 +1,29 @@
+Import('rtconfig')
+from building import *
+
+# get current directory
+cwd = GetCurrentDir()
+
+path = []
+src  = []
+libs = []
+libpath = []
+
+#
+# rt-thread port
+#
+path += [cwd + '/include']
+
+if ARGUMENTS.has_key('uselib') and int(ARGUMENTS['uselib']) == 0:
+    rtthread_port_src = Glob("*.c")
+    src += rtthread_port_src
+else:
+    libs += Split('''
+    librtthread_port_gcc.a
+    ''')
+
+    libpath += [cwd]
+
+group = DefineGroup('rtthread_port', src, depend = ['NB_USING_KERNEL_SERVICE'], CPPPATH = path, LIBS = libs, LIBPATH = libpath)
+
+Return('group')

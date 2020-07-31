@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<rsfotadesc>
+  <tool>diffTools-2.1.0_one_unit</tool>
+  <upunit type="image">
+    <blocksize>0x1000</blocksize>
+    <ramsize>0x15E000</ramsize>
+    <partition type="update">
+      <baseaddr>0x12000</baseaddr>
+      <range>0x236000</range>
+      <imagefile>ROM.bin</imagefile>
+      <elffile>ROM.elf</elffile>
+    </partition>
+    <partition type="backup">
+      <baseaddr>0x248000</baseaddr>
+      <range>0x15D000</range>
+      <buaddr>0x3A4000</buaddr>
+    </partition>
+  </upunit>
+</rsfotadesc>

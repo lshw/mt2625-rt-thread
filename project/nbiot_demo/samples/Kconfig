@@ -1,0 +1,64 @@
+menuconfig RT_USING_NB_SAMPLES
+    bool "NB-IOT samples"
+    default n
+
+    if RT_USING_NB_SAMPLES
+        config NB_GPIO_DEMO
+            bool "Enable gpio sample"
+            select BSP_USING_GPIO
+            default n
+
+        config NB_WDT_DEMO
+            bool "Enable watchdog driver sample"
+            select BSP_USING_WDT
+            default n
+
+        config NB_GPT_DEMO
+            bool "Enable gpt timer driver sample"
+            select BSP_USING_GPT_TIMER
+            select BSP_USING_GPT1
+            default n
+        
+        config NB_ADC_DEMO
+            bool "Enable adc driver sample"
+            select BSP_USING_ADC
+            select BSP_USING_ADC0
+            default n
+
+        config NB_PWM_DEMO
+            bool "Enable pwm driver sample"
+            select BSP_USING_PWM
+            select BSP_USING_PWM3
+            default n
+
+        config NB_UART_DEMO
+            bool "Enable uart sample"
+            select BSP_USING_UART
+            select BSP_USING_UART0
+            select BSP_USING_UART1
+            default n
+
+        config NB_LCD_DEMO
+            bool "Enable spi lcd driver sample"
+            select BSP_USING_SPI
+            select BSP_USING_SPI0
+            default n
+
+        config NB_TCP_DEMO
+            bool "Enable TCP sample"
+            default n
+
+        config NB_UDP_DEMO
+            bool "Enable UDP sample"
+            default n
+
+        config NB_ONENET_DEMO
+            bool "Enable onenet sample"
+            select NB_USING_ONENET
+            default n
+
+        config NB_ONENET_OTA_DEMO
+            bool "Enable onenet ota sample"
+            select NB_USING_RSFOTA
+            default n
+    endif

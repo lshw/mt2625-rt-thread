@@ -1,0 +1,52 @@
+mainmenu "RT-Thread Configuration"
+
+config BSP_DIR
+    string
+    option env="BSP_ROOT"
+    default "."
+
+config RTT_DIR
+    string
+    option env="RTT_ROOT"
+    default "../../rt-thread"
+
+config PKGS_DIR
+    string
+    option env="PKGS_ROOT"
+    default "packages"
+
+source "$RTT_DIR/Kconfig"
+source "$PKGS_DIR/Kconfig"
+
+# board/Kconfig
+source "$BSP_DIR/../../board/Kconfig"
+
+# mt2625 Kconfig
+source "$BSP_DIR/../../libraries/mt2625/Kconfig"
+
+# NB-IOT samples
+source "$BSP_DIR/samples/Kconfig"
+
+source "$BSP_DIR/../../Kconfig"
+
+config RT_NB_DBG_FEATURE
+    bool "NB-IOT debug feature"
+    default n
+
+config PRJ_USING_NBIOT_DEMO
+    bool 
+    select NB_USING_LWIP
+    select NB_USING_USB
+    select NB_USING_NB_MODEM
+    select NB_USING_NVDM_MODEM
+    select NB_USING_NVDM
+    select NB_USING_MTK_PORT_SERVICE
+    select NB_USING_TEL_CONN_MGR
+    select NB_USING_APB_PROXY
+    select NB_USING_RIL
+    select NB_USING_NIDD
+    select NB_USING_SIMAT_PROXY
+    select NB_USING_HDK
+    select NB_USING_MUX_AP
+    select NB_USING_KERNEL_SERVICE
+    default y

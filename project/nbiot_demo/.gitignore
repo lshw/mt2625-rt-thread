@@ -1,0 +1,4 @@
+*.a
+build
+.sconsign.dblite
+.config.old

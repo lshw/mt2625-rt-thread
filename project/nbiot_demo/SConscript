@@ -1,0 +1,147 @@
+import rtconfig
+from building import *
+
+Import('SDK_ROOT')
+
+# get current directory
+cwd = GetCurrentDir()
+
+src     = []
+path    = [cwd]
+
+LIBS    = []
+LIBPATH = []
+
+CPPDEFINES = []
+CCFLAGS    = ""
+LFLAGS     = ""
+
+path += [cwd + '/inc']
+
+project_src_files = Split('''
+GCC/syscalls.c
+src/ept_eint_var.c
+src/ept_gpio_var.c
+src/mtk_main.c
+src/md_init.c
+src/system_mt2625.c
+src/sys_init.c
+src/util.c
+''')
+
+if GetDepend(['NB_USING_HTTPCLIENT']):
+    project_src_files += Glob('src/auto_register.c')
+
+src += project_src_files
+
+if rtconfig.CROSS_TOOL == 'gcc':
+    src += Glob('GCC/startup_mt2625.s')
+    src += Glob('GCC/startup_md.s')
+else:
+    print('Error: Only support "gcc" cross tool!')
+    exit(-1)
+
+LFLAGS = " -T GCC/mt2625_flash_bring_up.ld "
+
+m2625_cflags = ' -mlittle-endian -mthumb -mcpu=cortex-m4 -fsingle-precision-constant -Wdouble-promotion '
+m2625_cflags += ' -mfpu=fpv4-sp-d16 -mfloat-abi=hard '
+m2625_cflags += ' -ffunction-sections -fdata-sections -fno-builtin -gdwarf-2 -Os -fno-strict-aliasing -fno-common '
+m2625_cflags += ' -Wimplicit-function-declaration -Wall -Werror=uninitialized -Wno-error=maybe-uninitialized -Werror=return-type '
+m2625_cflags += ' -std=gnu99 -Wno-switch -DPCFG_OS=2 -D_REENT_SMALL -DPRODUCT_VERSION=2625 '
+m2625_cflags += ' -DMTK_DEBUG_LEVEL_DEBUG -DMTK_DEBUG_LEVEL_INFO -DMTK_DEBUG_LEVEL_WARNING -DMTK_DEBUG_LEVEL_ERROR '
+m2625_cflags += ' -DMTK_USIMSMT_ENABLED -DMTK_PORT_SERVICE_ENABLE -DUSE_CONFIG_BUFFER -DMTK_MINI_DUMP_ENABLE '
+m2625_cflags += ' -DMTK_OS_CPU_UTILIZATION_ENABLE -DMTK_SYSTEM_AT_COMMAND_ENABLE -DMTK_CREATE_DEFAULT_APN '
+m2625_cflags += ' -D__MTK_TARGET__ -DUSE_HAL_DRIVER -DMTK_TCPIP_FOR_NB_MODULE_ENABLE -fomit-frame-pointer '
+m2625_cflags += ' -D__RIL_UT_TEST_CASES__ -DCIS_EMBED -DHAVE_STRUCT_TIMESPEC '
+m2625_cflags += ' -DMTK_NBIOT_TARGET_BUILD -DDEVELOPMENT_VERSION -D__arm '
+m2625_cflags += ' -DKI_RLG_ENABLE_EVENT_OVER_HSL -DKI_CHECK_ASSERTIONS -DKI_DISABLE_DYNAMIC_MEMORY '
+m2625_cflags += ' -DTEMP_FPGA_ML1S_HACKS -DNBIOT_TRACE_FILTER -DKI_ENABLE_OWN_QUEUEING -DKI_TIME_USE_TEN_MILLISECOND_TICK '
+m2625_cflags += ' -DKI_MAX_LOGGING_MEMORY=160000 -DKI_TTI_ENABLE_STATIC_FILTER -DKI_TTI_DISABLE_FILTER_SIZE_CHECK '
+m2625_cflags += ' -DKI_ASSERTFAIL_REMOVE_DEFAULT -DKI_MEMORY_USAGE -DKI_DISABLE_KM_DYNAMIC_MEMORY -DUSE_ULS '
+m2625_cflags += ' -DUSE_FILTER_PRECHECK_FUNCTION -DMTK_PLATFORM_MT2625 -DDONT_DISPLAY_ASSERTFAIL_MSG -DKI_ASSERT_NO_HSL '
+m2625_cflags += ' -DKI_EXTENDED_DEBUG -DKI_DISABLE_STACK_POOLS -DTASKSWITCH_PRINTF -DEMMI_BAUD_RATE_921600 -DROM_TEST_TASK '
+m2625_cflags += ' -DEMMI_UART_DMA_MODE -DEMMI_TX_BUFF_SIZE=512 -DEMMI_RX_BUFF_SIZE=512 -DEMMI_MAX_NUM_RX_BLOCKS=10 '
+m2625_cflags += ' -DEMMI_UART_PORT_USED=SERIAL_PORT_DEV_UART_1 -DMTK_CONNL_VIA_PORT_SERVICE -DMTK_CONNL_2ND_AT_PORT '
+m2625_cflags += ' -DUPGRADE_REL4 -DUPGRADE_REL5 -DUPGRADE_REL6 -DUPGRADE_REL7 -DUPGRADE_REL8 -DUPGRADE_REL8_USIM -DUPGRADE_REL9 '
+m2625_cflags += ' -DUPGRADE_SAT99 -DENABLE_EPLMN -DENABLE_EHPLMN -DUSE_TTP_AL -DUSE_ABAPP -DUPGRADE_GENERIC_MUX '
+m2625_cflags += ' -DGPRS_ATTACH_AT_POWER_ON -DENABLE_CIRM_DATA_IND -DENABLE_LONG_AT_CMD_RSP -DUPGRADE_NASMDL2 '
+m2625_cflags += ' -DUSE_L4MM_ALLOC_MEMORY -DENABLE_LTE_UPLANE_HSL -DUPGRADE_LTE -DUPGRADE_LTE_FDD -DUPGRADE_NB -DUPGRADE_3G '
+m2625_cflags += ' -DUPGRADE_3G_TDD128 -DUPGRADE_3G_HSDPA -DUPGRADE_3G_HSUPA -DUPS_CFG_E_DCH_CATEGORY_6 -DUPS_CFG_HS_DSCH_CATEGORY_8 '
+m2625_cflags += ' -DUPS_CFG_TDD128_HS_DSCH_CATEGORY_13 -DSIM_EMU_3G -DSIM_UICC_DEBUG_ATR3 -DUSIM_EMU_USE_EXPANDED_FORMAT '
+m2625_cflags += ' -DSIM_DEBUG_ATR -DUPGRADE_HIGH_SPEED_SIM -DSIM_EMU_ENABLE_EONS -DSIM_UICC_USE_VALUES_FROM_ATR '
+m2625_cflags += ' -DSIM_EMU_EMM_INFO_SUPPORTED -DSIM_DEBUG_COMMANDS -DENABLE_SIM_DRV_V2 -DUPGRADE_CSCI_MUX -DCONN_LAYER '
+m2625_cflags += ' -DUPGRADE_CONN_MDT_NB -DENABLE_BMM_MEM_OP_DEBUG -DINCLUDE_PPPA_EMULATION -DMTK_PPP_ENABLE -DFEA_PPP '
+m2625_cflags += ' -DEXCLUDE_L1MM -DEXCLUDE_CDMG -DEXCLUDE_DBG -DEXCLUDE_DSP_MULTIMEDIA -DEXCLUDE_U1CD -DEXCLUDE_U1IT '
+m2625_cflags += ' -DEXCLUDE_EBMM -DEXCLUDE_DM -DDM_EXCLUDE_RTC_DEVICE_MANAGER -DDM_EXCLUDE_NVRAM_DEVICE_DRIVER -DREMOVE_CB '
+m2625_cflags += ' -DDISABLE_DAI -DDISABLE_ATCI_LTE_GCF_SUPPORT -DABSH_EXCLUDE_CC -DABSH_EXCLUDE_CB -DABSH_EXCLUDE_LM '
+m2625_cflags += ' -DDISABLE_AUTO_SIM_POWERUP -DDISABLE_AUTO_PS_POWERUP -DENABLE_AP_BRIDGE_FEATURE -DFR_HSL_2_GKI '
+m2625_cflags += ' -DMTK_TOOL_AUTHENTICATION_ENABLE -DMTK_QUERY_SDK_VERSION '
+
+m2625_cflags += ' -DUSE_KIPRINTF_AS_PRINTF '
+#m2625_cflags += ' -DMTK_BUILD_SMT_LOAD '
+#m2625_cflags += ' -DATCI_APB_PROXY_ADAPTER_ENABLE '
+#m2625_cflags += ' -DFRT_KERNEL ' # removed in v1.9.0 version
+
+if GetDepend(['NB_USING_NETWORK_AT_CMD']):
+    m2625_cflags += ' -DMTK_ATCI_APB_PROXY_NETWORK_ENABLE '
+
+m2625_md_cflags = ' -DMTK_NBIOT_CUSTOM_BUILD -fmerge-all-constants '
+
+# v1.9.0 version new add
+m2625_cflags += ' -DRHINO=1 -DFreeRTOS=2 -DMTK_RTOS_TYPE=FreeRTOS -DFREERTOS_ENABLE '
+
+if GetDepend(['NB_USING_FUSION_SENSIO']):
+    m2625_cflags += ' -DFUSION_SENSIO_USE '
+# end
+
+m2625_linkflags = ' -mlittle-endian -mthumb -mcpu=cortex-m4 -fsingle-precision-constant -Wdouble-promotion '
+m2625_linkflags += ' -mfpu=fpv4-sp-d16 -mfloat-abi=hard --specs=nano.specs -lnosys -nostartfiles '
+m2625_linkflags += ' -u _printf_float -u _scanf_float '
+
+#
+# can`t comment fprintf, _printf_i 
+#
+m2625_linkflags += ' -Wl,--wrap=fprintf -Wl,--wrap=_printf_i '
+
+m2625_linkflags += ' -Wl,--gc-sections '
+m2625_linkflags += '-u build_date_time_str -u sw_verno_str -u hw_verno_str -u md_commit_id_str '
+
+CCFLAGS += m2625_cflags
+CCFLAGS += m2625_md_cflags
+
+LFLAGS += m2625_linkflags
+
+CPPDEFINES += ['IC_CONFIG=\\"mt2625\\"', 'BOARD_CONFIG=\\"mt2625_evb\\"']
+
+if GetDepend(['NB_USING_MBEDTLS']) or GetDepend(['PKG_USING_MBEDTLS']):
+    CPPDEFINES += ['MBEDTLS_CONFIG_FILE=\\"config-mtk-nbiot.h\\"']
+
+group = DefineGroup('prj_m2m', src, depend = ['PRJ_USING_NBIOT_DEMO'], CPPPATH = path, LIBS = LIBS, LIBPATH = LIBPATH, LINKFLAGS = LFLAGS, CCFLAGS = CCFLAGS, CPPDEFINES = CPPDEFINES)
+
+objs = []
+extern_objs = []
+list = os.listdir(cwd)
+
+libraries_script = os.path.join(SDK_ROOT, 'libraries', 'SConscript')
+drivers_script  = os.path.join(SDK_ROOT, 'drivers',  'SConscript')
+board_script    = os.path.join(SDK_ROOT, 'board',    'SConscript')
+ports_script    = os.path.join(SDK_ROOT, 'ports',    'SConscript')
+
+if ((not os.path.exists(libraries_script)) or
+    (not os.path.exists(drivers_script)) or
+    (not os.path.exists(board_script))):
+    print("source code path is not exist, please check.")
+    exit(-1)
+
+extern_objs = extern_objs + SConscript(libraries_script, variant_dir='libraries', duplicate=0)
+extern_objs = extern_objs + SConscript(drivers_script, variant_dir='drivers', duplicate=0)
+extern_objs = extern_objs + SConscript(board_script, variant_dir='board', duplicate=0)
+extern_objs = extern_objs + SConscript(ports_script, variant_dir='ports', duplicate=0)
+
+for d in list:
+    path = os.path.join(cwd, d)
+    if os.path.isfile(os.path.join(path, 'SConscript')):
+        objs = objs + SConscript(os.path.join(d, 'SConscript'))
+
+objs = group + extern_objs + objs
+Return('objs')

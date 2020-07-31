@@ -1,0 +1,20 @@
+import os
+import rtconfig
+from building import *
+
+cwd = GetCurrentDir()
+
+path =  [cwd]
+
+# add general drivers
+src = Glob('*.c')
+
+src += Glob("onenet/nb_onenet.c")
+src += Glob("onenet/nb_onenet_callback.c")
+path += [cwd + '/onenet']
+
+path += [cwd + '/tls_configs']
+
+group = DefineGroup('ports', src, depend = [''], CPPPATH = path)
+
+Return('group')
