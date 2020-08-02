@@ -31,7 +31,7 @@ if not os.path.exists(EXEC_PATH):
 print("EXEC_PATH: %s" % EXEC_PATH)
 
 
-BUILD = 'debug' # 'release' or 'debug'
+BUILD = 'release' # 'release' or 'debug'
 
 if PLATFORM == 'gcc':
     # toolchains
